@@ -101,8 +101,13 @@ const syncData = () => {
                     if (!Array.isArray(data) || data.length === 0) {
                         newdata = dataList;
                     } else {
-                        // 将dataList中的所有元素添加到newdata中
-                        newdata = [...newdata, ...dataList];
+                        dataList.forEach((element) => {
+                            const existing = data.findIndex((item) => item.name === element.name);
+                            if (existing === -1) {
+                                newdata.push(element);
+                            }
+                        });
+                        newdata = [...newdata, ...data];
                     }
                     message.success('接口获取数据成功');
                     await methods.setStorage({ cookie: newdata });
