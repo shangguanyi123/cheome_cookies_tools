@@ -9,7 +9,7 @@
                 <a-form-item :name="['cookiesArr', index, 'type']" label="type">
                     <a-radio-group v-model:value="sight.type">
                         <a-radio :value="1">cookie</a-radio>
-                        <a-radio :value="2">header</a-radio>
+                        <!-- <a-radio :value="2">header</a-radio> -->
                     </a-radio-group>
                 </a-form-item>
                 <a-form-item :name="['cookiesArr', index, 'name']" label="name" :rules="{
