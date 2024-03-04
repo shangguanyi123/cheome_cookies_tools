@@ -96,6 +96,7 @@ const syncData = () => {
                     message.success('接口暂无有效数据');
                     return;
                 }
+                data.value = dataList; //更新组件的数据状态，触发页面重新渲染
                 methods.getStorage('cookie', async (data) => {
                     let newdata = [];
                     if (!Array.isArray(data) || data.length === 0) {
@@ -103,12 +104,18 @@ const syncData = () => {
                     } else {
                         dataList.forEach((element) => {
                             const existing = data.findIndex((item) => item.name === element.name);
-                            if (existing === -1) {
+                            if (existing !== -1) {
+                                // 更新已存在的元素
+                                data[existing] = element;
+                            } else {
+                                // 将不存在的元素插入到数组末尾
                                 newdata.push(element);
                             }
                         });
                         newdata = [...newdata, ...data];
                     }
+
+
                     message.success('接口获取数据成功');
                     await methods.setStorage({ cookie: newdata });
                     getList();
