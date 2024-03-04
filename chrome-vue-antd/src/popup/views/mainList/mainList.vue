@@ -3,8 +3,11 @@
         <a-space wrap>
             <a-button type="primary" @click="$router.push('/add')">添加</a-button>
             <a-button type="primary" @click="syncData">同步数据</a-button>
-            <a-popconfirm title="确定清除当前窗口所有Cookie?" ok-text="Yes" cancel-text="No" @confirm="removeCookie">
-                <a-button danger block>清除所有cookie</a-button>
+            <a-popconfirm title="确定清除当前页面所有Cookie？" ok-text="Yes" cancel-text="No" @confirm="removeCookie">
+                <a-button danger block>清除当前页面cookie</a-button>
+            </a-popconfirm>
+            <a-popconfirm title="确定删除所有Cookie？" ok-text="Yes" cancel-text="No" @confirm="deleteAllCookies">
+                <a-button type="primary" danger block>删除所有cookie</a-button>
             </a-popconfirm>
         </a-space>
         <a-table :columns="columns" :data-source="data" :scroll="{ x: '100%' }" size='small'
@@ -28,7 +31,7 @@
                                 @click="$router.push({ path: '/edit', query: { row: JSON.stringify(record) } })" />
                         </a-tooltip>
                         <a-divider type="vertical" />
-                        <a-popconfirm title="Are you sure delete?" ok-text="Yes" cancel-text="No"
+                        <a-popconfirm title="你确定删除吗？" ok-text="Yes" cancel-text="No"
                             @confirm="delCookie(index)">
                             <a-tooltip>
                                 <template #title>删除</template>
@@ -36,7 +39,7 @@
                             </a-tooltip>
                         </a-popconfirm>
                         <a-divider type="vertical" />
-                        <a-popconfirm title="Are you sure inject?" ok-text="Yes" cancel-text="No"
+                        <a-popconfirm title="你确定注入吗？" ok-text="Yes" cancel-text="No"
                             @confirm="injectCookie(record)">
                             <a-tooltip>
                                 <template #title>注入</template>
@@ -45,7 +48,7 @@
                         </a-popconfirm>
                         <a-divider type="vertical" />
                         <a-tooltip>
-                            <template #title>拷贝窗口当前所有cookie</template>
+                            <template #title>拷贝当前窗口所有cookie</template>
                             <RedoOutlined @click="copyAllCookie(record.name)" />
                         </a-tooltip>
                     </div>
@@ -58,7 +61,7 @@
 import { apiReqs } from '@/api'
 import { DeleteOutlined, AimOutlined, FormOutlined, RedoOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
-import { ref, inject, onMounted } from 'vue';
+import { ref, inject, onMounted  } from 'vue';
 const methods = inject('globalMethods');
 const data = ref([]);
 const usedCookie = ref({});
@@ -144,6 +147,7 @@ const copyAllCookie = (name) => {
     });
 }
 
+
 const delCookie = (index) => {
     data.value.splice(index, 1);
     methods.setStorage({ 'cookie': data.value });
@@ -187,16 +191,24 @@ const getUsedCookie = () => {
     });
 }
 
+
+
 const getList = () => {
     // 获取cookie列表
     methods.getStorage(('cookie'), async (list) => {
         console.log("Cookie list is", list)
         if (Array.isArray(list) && list.length > 0) {
-            data.value = list
+            data.value = [...list]; // 修改数据的引用，触发组件的重新渲染
         } else {
-            methods.delAllStorage()
+            methods.delAllStorage();
         }
     });
+}
+
+
+const deleteAllCookies = () => {
+    methods.delAllStorage(); // 调用删除所有 cookie 的方法
+    data.value = []; // 清空 data 列表，可能需要根据具体情况进行处理
 }
 
 onMounted(() => {
@@ -205,6 +217,8 @@ onMounted(() => {
     // 已注入cookie
     getUsedCookie()
 })
+
+
 </script>
 <style scoped>
 .highlighted {
